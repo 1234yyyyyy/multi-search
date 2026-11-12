@@ -113,6 +113,13 @@ const DEF={
     {n:'IMDb',u:'https://www.imdb.com/find/?q=%s',on:false},
     {n:'Perplexity',u:'https://www.perplexity.ai/search?q=%s',on:false}
   ],
+  ai:[
+    {n:'Grok',u:'https://grok.com/?q=%s'},
+    {n:'Claude',u:'https://claude.ai/new?q=%s'},
+    {n:'ChatGPT',u:'https://chatgpt.com/?q=%s'},
+    {n:'Gemini',u:'https://www.google.com/search?q=%s&udm=50'},
+    {n:'Muse',u:'https://www.meta.ai/?q=%s'}
+  ],
   lib:[
     {g:'內容',k:['心得','推薦','評測','比較','教學','懶人包','片單']},
     {g:'時間',k:['2026','2025','最新']},
@@ -142,6 +149,11 @@ if(!S||!S.sites||!S.lib){
   try{const old=JSON.parse(localStorage.getItem('multiSearch.v1'));if(old&&old.sites)S.sites=old.sites}catch(e){}
 }
 if(!S.packs)S.packs=structuredClone(DEF.packs);
+if(!S.ai1){
+  DEF.ai.forEach(a=>{if(!S.sites.some(s=>s.u===a.u))S.sites.push({n:a.n,u:a.u,on:false})});
+  if(!S.packs.some(p=>p.n==='AI'))S.packs.unshift({n:'AI',q:'',eq:[],sites:DEF.ai.map(a=>({...a}))});
+  S.ai1=true;
+}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const $=s=>document.querySelector(s);
 const q=$('#q');
@@ -250,6 +262,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#lib').classList
 $('#go').onclick=()=>openList(S.sites.filter(s=>s.on));
 $('#openAll').onclick=()=>openList(S.sites);
 all();q.focus();
+{const p=new URLSearchParams(location.search).get('q');
+ if(p){q.value=p;history.replaceState(null,'',location.pathname);openList(S.sites.filter(s=>s.on))}}
 </script>
 </body>
 </html>
